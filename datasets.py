@@ -21,36 +21,12 @@ except ImportError:
 from utils import open_file
 
 DATASETS_CONFIG = {
-        'PaviaC': {
-            'urls': ['http://www.ehu.eus/ccwintco/uploads/e/e3/Pavia.mat', 
-                     'http://www.ehu.eus/ccwintco/uploads/5/53/Pavia_gt.mat'],
-            'img': 'Pavia.mat',
-            'gt': 'Pavia_gt.mat'
-            },
-        'PaviaU': {
-            'urls': ['http://www.ehu.eus/ccwintco/uploads/e/ee/PaviaU.mat',
-                     'http://www.ehu.eus/ccwintco/uploads/5/50/PaviaU_gt.mat'],
-            'img': 'PaviaU.mat',
-            'gt': 'PaviaU_gt.mat'
-            },
-        'KSC': {
-            'urls': ['http://www.ehu.es/ccwintco/uploads/2/26/KSC.mat',
-                     'http://www.ehu.es/ccwintco/uploads/a/a6/KSC_gt.mat'],
-            'img': 'KSC.mat',
-            'gt': 'KSC_gt.mat'
-            },
         'IndianPines': {
             'urls': ['http://www.ehu.eus/ccwintco/uploads/6/67/Indian_pines_corrected.mat',
                      'http://www.ehu.eus/ccwintco/uploads/c/c4/Indian_pines_gt.mat'],
             'img': 'Indian_pines_corrected.mat',
             'gt': 'Indian_pines_gt.mat'
             },
-        'Botswana': {
-            'urls': ['http://www.ehu.es/ccwintco/uploads/7/72/Botswana.mat',
-                     'http://www.ehu.es/ccwintco/uploads/5/58/Botswana_gt.mat'],
-            'img': 'Botswana.mat',
-            'gt': 'Botswana_gt.mat',
-            }
     }
 
 try:
@@ -111,35 +87,7 @@ def get_dataset(dataset_name, target_folder="./", datasets=DATASETS_CONFIG):
     elif not os.path.isdir(folder):
        print("WARNING: {} is not downloadable.".format(dataset_name))
 
-    if dataset_name == 'PaviaC':
-        # Load the image
-        img = open_file(folder + 'Pavia.mat')['pavia']
-
-        rgb_bands = (55, 41, 12)
-
-        gt = open_file(folder + 'Pavia_gt.mat')['pavia_gt']
-
-        label_values = ["Undefined", "Water", "Trees", "Asphalt",
-                        "Self-Blocking Bricks", "Bitumen", "Tiles", "Shadows",
-                        "Meadows", "Bare Soil"]
-
-        ignored_labels = [0]
-
-    elif dataset_name == 'PaviaU':
-        # Load the image
-        img = open_file(folder + 'PaviaU.mat')['paviaU']
-
-        rgb_bands = (55, 41, 12)
-
-        gt = open_file(folder + 'PaviaU_gt.mat')['paviaU_gt']
-
-        label_values = ['Undefined', 'Asphalt', 'Meadows', 'Gravel', 'Trees',
-                        'Painted metal sheets', 'Bare Soil', 'Bitumen',
-                        'Self-Blocking Bricks', 'Shadows']
-
-        ignored_labels = [0]
-
-    elif dataset_name == 'IndianPines':
+    if dataset_name == 'IndianPines':
         # Load the image
         img = open_file(folder + 'Indian_pines_corrected.mat')
         img = img['indian_pines_corrected']
@@ -156,40 +104,9 @@ def get_dataset(dataset_name, target_folder="./", datasets=DATASETS_CONFIG):
 
         ignored_labels = [0]
 
-    elif dataset_name == 'Botswana':
-        # Load the image
-        img = open_file(folder + 'Botswana.mat')['Botswana']
-
-        rgb_bands = (75, 33, 15)
-
-        gt = open_file(folder + 'Botswana_gt.mat')['Botswana_gt']
-        label_values = ["Undefined", "Water", "Hippo grass",
-                        "Floodplain grasses 1", "Floodplain grasses 2",
-                        "Reeds", "Riparian", "Firescar", "Island interior",
-                        "Acacia woodlands", "Acacia shrublands",
-                        "Acacia grasslands", "Short mopane", "Mixed mopane",
-                        "Exposed soils"]
-
-        ignored_labels = [0]
-
-    elif dataset_name == 'KSC':
-        # Load the image
-        img = open_file(folder + 'KSC.mat')['KSC']
-
-        rgb_bands = (43, 21, 11)  # AVIRIS sensor
-
-        gt = open_file(folder + 'KSC_gt.mat')['KSC_gt']
-        label_values = ["Undefined", "Scrub", "Willow swamp",
-                        "Cabbage palm hammock", "Cabbage palm/oak hammock",
-                        "Slash pine", "Oak/broadleaf hammock",
-                        "Hardwood swamp", "Graminoid marsh", "Spartina marsh",
-                        "Cattail marsh", "Salt marsh", "Mud flats", "Wate"]
-
-        ignored_labels = [0]
     else:
-        # Custom dataset
-        img, gt, rgb_bands, ignored_labels, label_values, palette = CUSTOM_DATASETS_CONFIG[dataset_name]['loader'](folder)
-
+        raise NotImplementedError
+    
     # Filter NaN out
     nan_mask = np.isnan(img.sum(axis=-1))
     if np.count_nonzero(nan_mask) > 0:
@@ -206,6 +123,7 @@ def get_dataset(dataset_name, target_folder="./", datasets=DATASETS_CONFIG):
     #data = preprocessing.scale(data)
     data  = preprocessing.minmax_scale(data)
     img = data.reshape(img.shape)
+
     return img, gt, label_values, ignored_labels, rgb_bands, palette
 
 
