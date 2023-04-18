@@ -94,6 +94,16 @@ class ConfigRegistry:
     DEPTHWISE_LAYER_PROB = LAYER_SHAPES_DIR / 'depth_wise.yaml'
     POINTWISE_LAYER_PROB = LAYER_SHAPES_DIR / 'point_wise.yaml'
 
+    #################################
+    # Hamida
+    #################################
+    LAYER_SHAPES_DIR = Path('layer_shapes')
+    TINY_LAYER_PROB  = LAYER_SHAPES_DIR / 'tiny_layer.yaml'
+    SMALL_LAYER_PROB = LAYER_SHAPES_DIR / 'small_layer.yaml'
+    MED_LAYER_PROB   = LAYER_SHAPES_DIR / 'medium_layer.yaml'
+    DEPTHWISE_LAYER_PROB = LAYER_SHAPES_DIR / 'depth_wise.yaml'
+    POINTWISE_LAYER_PROB = LAYER_SHAPES_DIR / 'point_wise.yaml'
+
 def load_config(*paths):
     yaml = YAML(typ='safe')
     yaml.version = (1, 2)
