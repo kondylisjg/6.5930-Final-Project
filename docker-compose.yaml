@@ -33,7 +33,7 @@ services:
     ports:
       - "8888:8888"
     volumes:
-      - ./workspace:/home/workspace
+      - ./src:/home/workspace
     environment:
       - USER_UID=1000
       - USER_GID=1000

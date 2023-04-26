@@ -1,0 +1,15 @@
+ART:
+  version: 0.3
+  tables:
+  - name: single_pe_arch.DRAM
+    area: 0
+  - name: single_pe_arch.chip.PE.scratchpad
+    area: 292.555
+  - name: single_pe_arch.chip.PE.mac
+    area: 1726.5
+  - name: single_pe_arch.chip.PE.weight_reg
+    area: 5.98
+  - name: single_pe_arch.chip.PE.input_activation_reg
+    area: 5.98
+  - name: single_pe_arch.chip.PE.output_activation_reg
+    area: 5.98
