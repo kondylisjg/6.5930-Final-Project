@@ -15,20 +15,21 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 
+
 class ConfigRegistry:
     #################################
     # Single PE
     #################################
-    SINGLE_PE_DIR                     = Path('designs/singlePE')
+    SINGLE_PE_DIR                     = Path('singlePE')
     SINGLE_PE_ARCH                    = SINGLE_PE_DIR / 'arch/single_PE_arch.yaml'
     SINGLE_PE_COMPONENTS_DIR          = SINGLE_PE_DIR / 'arch/components'
     SINGLE_PE_COMPONENT_SMART_STORAGE = SINGLE_PE_COMPONENTS_DIR / 'smart_storage.yaml'
     SINGLE_PE_COMPONENT_MAC_COMPUTE   = SINGLE_PE_COMPONENTS_DIR / 'mac_compute.yaml'
     SINGLE_PE_COMPONENT_REG_STORAGE   = SINGLE_PE_COMPONENTS_DIR / 'reg_storage.yaml'
 
-    SINGLE_PE_MAP = Path('designs/singlePE/map/map.yaml')
+    SINGLE_PE_MAP = Path('singlePE/map/map.yaml')
 
-    SINGLE_PE_AG_DIR                            = Path('designs/singlePE_ag')
+    SINGLE_PE_AG_DIR                            = Path('singlePE_ag')
     SINGLE_PE_AG_ARCH                           = SINGLE_PE_AG_DIR / 'arch/single_PE_arch.yaml'
     SINGLE_PE_AG_COMPONENTS_DIR                 = SINGLE_PE_AG_DIR / 'arch/components'
     SINGLE_PE_AG_COMPONENT_SMART_STORAGE        = SINGLE_PE_AG_COMPONENTS_DIR / 'smart_storage.yaml'
@@ -36,7 +37,7 @@ class ConfigRegistry:
     SINGLE_PE_AG_COMPONENT_MAC_COMPUTE          = SINGLE_PE_AG_COMPONENTS_DIR / 'mac_compute.yaml'
     SINGLE_PE_AG_COMPONENT_REG_STORAGE          = SINGLE_PE_AG_COMPONENTS_DIR / 'reg_storage.yaml'
 
-    SINGLE_PE_OS_DIR            = Path('designs/singlePE_os')
+    SINGLE_PE_OS_DIR            = Path('singlePE_os')
     SINGLE_PE_OS_ARCH           = SINGLE_PE_OS_DIR / 'arch/single_PE_arch.yaml'
     SINGLE_PE_OS_COMPONENTS_DIR = SINGLE_PE_OS_DIR / 'arch/components'
 
@@ -47,7 +48,7 @@ class ConfigRegistry:
     #################################
     # System Manual
     #################################
-    SYSTEM_MANUAL_DIR      = Path('designs/system_manual')
+    SYSTEM_MANUAL_DIR      = Path('system_manual')
     SYSTEM_1x16_ARCH       = SYSTEM_MANUAL_DIR / 'arch/system_arch_1x16.yaml'
     SYSTEM_2x8_ARCH_WIDGET = SYSTEM_MANUAL_DIR / 'arch/system_arch_2x8-widget.yaml'
     SYSTEM_4x4_ARCH_WIDGET = SYSTEM_MANUAL_DIR / 'arch/system_arch_4x4-widget.yaml'
@@ -60,39 +61,21 @@ class ConfigRegistry:
     #################################
     # System Auto
     #################################
-    SYSTEM_AUTO_DIR     = Path('designs/system_auto')
+    SYSTEM_AUTO_DIR     = Path('system_auto')
     CONSTRAINTS_DIR     = SYSTEM_AUTO_DIR / 'constraints'
     EXAMPLE_CONSTRAINTS = CONSTRAINTS_DIR / 'example_constraints.yaml'
     RELAXED_CONSTRAINTS = CONSTRAINTS_DIR / 'relaxed_constraints.yaml'
     MAPPER              = SYSTEM_AUTO_DIR / 'mapper/mapper.yaml'
 
-    #################################
-    # PIM
-    #################################
-    PIM_DIR            = Path('designs/PIM')
-    PIM_ARCH           = PIM_DIR / 'arch/system_PIM.yaml'
-    PIM_COMPONENTS_DIR = PIM_DIR / 'arch/components'
-    PIM_CONSTRAINTS    = PIM_DIR / 'constraints/constraints.yaml'
-    PIM_MAPPER         = PIM_DIR / 'mapper/mapper.yaml'
-
-    #################################
-    # PIM Large
-    #################################
-    PIM_LARGE_DIR            = Path('designs/PIM_large')
-    PIM_LARGE_ARCH           = PIM_LARGE_DIR / 'arch/system_PIM.yaml'
-    PIM_LARGE_COMPONENTS_DIR = PIM_LARGE_DIR / 'arch/components'
-    PIM_LARGE_CONSTRAINTS    = PIM_LARGE_DIR / 'constraints/constraints.yaml'
-    PIM_LARGE_MAPPER         = PIM_LARGE_DIR / 'mapper/mapper.yaml'
-
-    #################################
-    # Problems
-    #################################
-    LAYER_SHAPES_DIR = Path('layer_shapes')
-    TINY_LAYER_PROB  = LAYER_SHAPES_DIR / 'tiny_layer.yaml'
-    SMALL_LAYER_PROB = LAYER_SHAPES_DIR / 'small_layer.yaml'
-    MED_LAYER_PROB   = LAYER_SHAPES_DIR / 'medium_layer.yaml'
-    DEPTHWISE_LAYER_PROB = LAYER_SHAPES_DIR / 'depth_wise.yaml'
-    POINTWISE_LAYER_PROB = LAYER_SHAPES_DIR / 'point_wise.yaml'
+    # #################################
+    # # Problems
+    # #################################
+    # LAYER_SHAPES_DIR = Path('layer_shapes')
+    # TINY_LAYER_PROB  = LAYER_SHAPES_DIR / 'tiny_layer.yaml'
+    # SMALL_LAYER_PROB = LAYER_SHAPES_DIR / 'small_layer.yaml'
+    # MED_LAYER_PROB   = LAYER_SHAPES_DIR / 'medium_layer.yaml'
+    # DEPTHWISE_LAYER_PROB = LAYER_SHAPES_DIR / 'depth_wise.yaml'
+    # POINTWISE_LAYER_PROB = LAYER_SHAPES_DIR / 'point_wise.yaml'
 
     #################################
     # Hamida
@@ -176,6 +159,9 @@ def load_widget_config(*paths, title=''):
     return widget
 
 def run_timeloop_model(*paths):
+    # (PosixPath('designs/singlePE/arch/single_PE_arch.yaml'), PosixPath('designs/singlePE/arch/components'),
+    #  PosixPath('designs/singlePE/map/map.yaml'), PosixPath('layer_shapes/small_layer.yaml'))
+    print(*paths)
     yaml_str = dump_str(load_config(*paths))
     model = ModelApp(yaml_str, '.')
     result = model.run_subprocess()

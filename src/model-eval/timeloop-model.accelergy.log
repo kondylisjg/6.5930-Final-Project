@@ -8,9 +8,9 @@
 Info: generating outputs according to the following specified output flags... 
  Please use the -f flag to update the preference (default to all output files) 
 {'ERT': 1, 'ERT_summary': 1, 'ART': 1, 'ART_summary': 1, 'energy_estimation': 1, 'flattened_arch': 1}
-Info: config file located: /home/workspace/.config/accelergy/accelergy_config.yaml 
+Info: config file located: /root/.config/accelergy/accelergy_config.yaml 
 config file content: 
- {'compound_components': [], 'estimator_plug_ins': ['/usr/local/share/accelergy/estimation_plug_ins'], 'primitive_components': ['/usr/local/share/accelergy/primitive_component_libs'], 'table_plug_ins': {'roots': ['/usr/local/share/accelergy/estimation_plug_ins/accelergy-table-based-plug-ins/set_of_table_templates', '/home/workspace/lab3/PIM_estimation_tables', '/home/workspace/lab4/PIM_estimation_tables']}, 'version': 0.3}
+ {'compound_components': [], 'estimator_plug_ins': ['/usr/local/share/accelergy/estimation_plug_ins'], 'primitive_components': ['/usr/local/share/accelergy/primitive_component_libs'], 'version': 0.3}
 Warn: Cannot recognize the top key "mapping" in file tmp.yaml 
 Warn: Cannot recognize the top key "problem" in file tmp.yaml 
 Info: Parsing file tmp.yaml for architecture info 
@@ -20,21 +20,13 @@ Info: Found non-numeric expression 45nm. Available bindings: {'latency': '1ns', 
 WARN: Failed to evaluate "45nm". Setting single_pe_arch.technology="45nm". Available bindings: {'latency': '1ns', 'technology': '45nm'}
 Info: Parsing file tmp.yaml for compound_components info 
 Info: primitive component file parsed:  /usr/local/share/accelergy/primitive_component_libs/primitive_component.lib.yaml 
-Info: primitive component file parsed:  /usr/local/share/accelergy/primitive_component_libs/pim_primitive_component.lib.yaml 
 Info: primitive component file parsed:  /usr/local/share/accelergy/primitive_component_libs/soc_primitives.lib.yaml 
+Info: primitive component file parsed:  /usr/local/share/accelergy/primitive_component_libs/pim_primitive_component.lib.yaml 
 Info: Found non-numeric expression LPDDR4. Available bindings: {'block-size': 4, 'datawidth': 16, 'reduction_supported': True, 'width': 64, 'latency': '1ns', 'technology': '45nm', 'type': 'LPDDR4'} 
 WARN: Failed to evaluate "LPDDR4". Setting single_pe_arch.DRAM.type="LPDDR4". Available bindings: {'block-size': 4, 'datawidth': 16, 'reduction_supported': True, 'width': 64, 'latency': '1ns', 'technology': '45nm', 'type': 'LPDDR4'}
 Info: estimator plug-in identified by:  /usr/local/share/accelergy/estimation_plug_ins/accelergy-cacti-plug-in/cacti.estimator.yaml 
 Info: estimator plug-in identified by:  /usr/local/share/accelergy/estimation_plug_ins/dummy_tables/dummy.estimator.yaml 
 Info: estimator plug-in identified by:  /usr/local/share/accelergy/estimation_plug_ins/accelergy-table-based-plug-ins/table.estimator.yaml 
-table-based-plug-ins Identifies a set of tables named:  test_tables
-table-based-plug-ins Identifies a set of tables named:  32nm_tables
-table-based-plug-ins Identifies a set of tables named:  memristor_tables
-Info: estimator plug-in identified by:  /usr/local/share/accelergy/estimation_plug_ins/accelergy-aladdin-plug-in/aladdin.estimator.yaml 
-Warn: No action counts are specified as yaml input 
-Info: flattened architecture is saved to: ./timeloop-model.flattened_architecture.yaml 
-Info: energy reference table is saved to: ./timeloop-model.ERT.yaml 
-Info: energy reference table summary is saved to: ./timeloop-model.ERT_summary.yaml 
-Warn: no runtime energy estimations are generated... not generating energy_estimation.yaml 
-Info: area reference table is saved to: ./timeloop-model.ART.yaml 
-Info: area reference table summary is saved to: ./timeloop-model.ART_summary.yaml 
+table-based-plug-ins : ERROR -- cannot find the listed roots for the sets of tables
+Please initialize by running: accelergyTables
+A pointer to the default set of tables will be created in ~/.config/accelergy/accelergy_config.yaml
