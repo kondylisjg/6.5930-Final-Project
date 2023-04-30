@@ -1,0 +1,164 @@
+architecture:
+  version: 0.3
+  local:
+  - name: single_pe_arch.chip.PE.scratchpad
+    class: smart_storage
+    attributes:
+      depth: 18
+      latency: 1ns
+      technology: 45nm
+      width: 16
+    primitive_components:
+    - name: storage
+      class: regfile
+      attributes:
+        depth: 18
+        latency: 1ns
+        technology: 45nm
+        width: 16
+        n_ports: 2
+      area_share: 1
+    - name: address_generator
+      class: intadder
+      attributes:
+        datawidth: 5
+        latency: 1ns
+        technology: 45nm
+        num_pipeline_stages: 1
+      area_share: 1
+    actions:
+    - name: read
+      arguments: null
+      primitive_actions:
+      - name: storage
+        action: read
+        arguments:
+          address_delta: 1
+          data_delta: 1
+        action_share: 1
+      - name: address_generator
+        action: compute
+        arguments:
+          address_delta: 1
+          data_delta: 1
+        action_share: 1
+    - name: write
+      arguments: null
+      primitive_actions:
+      - name: storage
+        action: write
+        arguments:
+          address_delta: 1
+          data_delta: 1
+        action_share: 1
+      - name: address_generator
+        action: compute
+        arguments:
+          address_delta: 1
+          data_delta: 1
+        action_share: 1
+  - name: single_pe_arch.chip.PE.mac
+    class: mac_compute
+    attributes:
+      datawidth: 16
+      latency: 1ns
+      num_pipeline_stages: 2
+      num_pipline_stages: 2
+      technology: 45nm
+    primitive_components:
+    - name: compute
+      class: intmac
+      attributes:
+        datawidth: 16
+        latency: 1ns
+        num_pipeline_stages: 2
+        technology: 45nm
+      area_share: 1
+    actions:
+    - name: compute
+      arguments: null
+      primitive_actions:
+      - name: compute
+        action: read
+        arguments:
+          address_delta: 1
+          data_delta: 1
+        action_share: 1
+  - name: single_pe_arch.chip.PE.weight_reg
+    class: reg_storage
+    attributes:
+      depth: 1
+      latency: 1ns
+      technology: 45nm
+      width: 16
+    primitive_components:
+    - name: storage
+      class: reg
+      attributes:
+        datawidth: 16
+        latency: 1ns
+        technology: 45nm
+      area_share: 1
+    actions:
+    - name: access
+      arguments: null
+      primitive_actions:
+      - name: storage
+        action: access
+        arguments: null
+        action_share: 1
+  - name: single_pe_arch.chip.PE.input_activation_reg
+    class: reg_storage
+    attributes:
+      depth: 1
+      latency: 1ns
+      technology: 45nm
+      width: 16
+    primitive_components:
+    - name: storage
+      class: reg
+      attributes:
+        datawidth: 16
+        latency: 1ns
+        technology: 45nm
+      area_share: 1
+    actions:
+    - name: access
+      arguments: null
+      primitive_actions:
+      - name: storage
+        action: access
+        arguments: null
+        action_share: 1
+  - name: single_pe_arch.chip.PE.output_activation_reg
+    class: reg_storage
+    attributes:
+      depth: 1
+      latency: 1ns
+      technology: 45nm
+      width: 16
+    primitive_components:
+    - name: storage
+      class: reg
+      attributes:
+        datawidth: 16
+        latency: 1ns
+        technology: 45nm
+      area_share: 1
+    actions:
+    - name: access
+      arguments: null
+      primitive_actions:
+      - name: storage
+        action: access
+        arguments: null
+        action_share: 1
+  - name: single_pe_arch.DRAM
+    class: DRAM
+    actions:
+    - name: read
+      arguments: null
+    - name: write
+      arguments: null
+    - name: idle
+      arguments: null

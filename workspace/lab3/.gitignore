@@ -1,0 +1,6 @@
+**/output/
+timeloop-model.*
+timeloop-mapper.*
+ART*
+ERT*
+flattened_architecture.yaml
