@@ -32,21 +32,35 @@ def get_energy(model,
     # sum up per layer energy
     total_energy = 0
     per_layer_energy = []
+    total_mac = 0
+    per_layer_mac = []
+    total_cycle = 0
+    per_layer_cycle = []
+    total_param = 0
+    per_layer_param = []
     for n, (type, params, x_in, x_out) in enumerate(zip(layer_types, layer_params, data_sizes, data_sizes[1:])):
         # get yaml strings for layer shape and mapping
         if type == "linear":
             layer_spec = _get_linear_layer_yaml(x_in[0], params[0], params[1])
             map_spec = _get_linear_map_yaml(x_in[0], params[0], params[1])
+            num_params = params[0] * params[1]
         elif type == "conv2d":
             assert x_in[1] == params[0]
             assert x_out[1] == params[1]
-            layer_spec = _get_conv2d_layer_yaml(x_in[0], params[0], params[1], params[2][0], params[2][1], x_out[2], x_out[3], params[3][0], params[3][1])
-            map_spec = _get_conv2d_map_yaml(x_in[0], params[0], params[1], params[2][0], params[2][1], x_out[2], x_out[3])
+            layer_spec = _get_conv2d_layer_yaml(x_in[0], params[0], params[1], params[2][0], params[2][1], 
+                                                x_out[2], x_out[3], params[3][0], params[3][1])
+            map_spec = _get_conv2d_map_yaml(x_in[0], params[0], params[1], params[2][0], params[2][1], 
+                                            x_out[2], x_out[3])
+            num_params = params[0] * params[1] * params[2][0] * params[2][1]
         elif type == "conv3d":
             assert x_in[1] == params[0]
             assert x_out[1] == params[1]
-            layer_spec = _get_conv3d_layer_yaml(x_in[0], params[0], params[1], params[2][0], params[2][1], params[2][2], x_out[2], x_out[3], x_out[4], params[3][0], params[3][1], params[3][2])
-            map_spec = _get_conv3d_map_yaml(x_in[0], params[0], params[1], params[2][0], params[2][1], params[2][2], x_out[2], x_out[3], x_out[4])
+            layer_spec = _get_conv3d_layer_yaml(x_in[0], params[0], params[1], params[2][0], params[2][1], 
+                                                params[2][2], x_out[2], x_out[3], x_out[4], params[3][0], 
+                                                params[3][1], params[3][2])
+            map_spec = _get_conv3d_map_yaml(x_in[0], params[0], params[1], params[2][0], params[2][1], 
+                                            params[2][2], x_out[2], x_out[3], x_out[4])
+            num_params = params[0] * params[1] * params[2][0] * params[2][1] * params[2][2]
         else:
             raise NotImplementedError
 
@@ -61,25 +75,59 @@ def get_energy(model,
         # execute timeloop
         layer_shape_path = PosixPath(layer_shape_path)
         map_path = PosixPath(map_path)
-
-        # stats, _ = run_timeloop_model(hw_arch_path, hw_components_dir_path, map_path, layer_shape_path)
-        stats, _ = run_timeloop_mapper(hw_arch_path, hw_components_dir_path, layer_shape_path, map_path, mapper_config_path)
-
-        # debug
-        if verbose:
-            print()
-            print("############################################################")
-            print(n, "Layer:", type, params, "input dim:", x_in)
-            print("############################################################")
-            print(stats)
-
-        # parse out total energy in uJ
-        layer_energy = float(stats.split("\n")[-22].split(" ")[1])
+        layer_energy, layer_macs, layer_cycles = _exec_timeloop_and_parse(n, hw_arch_path, hw_components_dir_path, 
+                                                                          layer_shape_path, map_path, mapper_config_path, 
+                                                                          type, layers_path, verbose)
+        
+        # add energy, MACs, cycles and params
         total_energy += layer_energy
         per_layer_energy.append(layer_energy)
+        total_mac += layer_macs
+        per_layer_mac.append(layer_macs)
+        total_cycle += layer_cycles
+        per_layer_cycle.append(layer_cycles)
+        total_param += num_params
+        per_layer_param.append(num_params) 
+        
+    return layer_types, total_energy, per_layer_energy, total_mac, per_layer_mac, total_param, per_layer_param, total_cycle, per_layer_cycle
 
-    return total_energy, per_layer_energy
 
+def _exec_timeloop_and_parse(n, hw_arch_path, hw_components_dir_path, layer_shape_path, map_path, 
+                             mapper_config_path, layer_type, layers_path, verbose=False, all_dram=False):
+    
+    if all_dram:
+        map_path = os.path.join(layers_path, "map_c2d_all_dram.yaml")
+        
+        with open("_map/conv2d_map_all_dram.yaml", "w+") as f:
+            f.write(_get_conv2d_map_all_dram_yaml())
+            
+        map_path = PosixPath(map_path)
+    
+    
+    stats, _ = run_timeloop_mapper(hw_arch_path, hw_components_dir_path, layer_shape_path, map_path, mapper_config_path)
+
+    # debug
+    if verbose:
+        print()
+        print("############################################################")
+        print(f"Layer {n}:", layer_type)
+        print("############################################################")
+        print(stats)
+
+    # parse out total energy in uJ
+    try:
+        layer_energy = float(stats.split("\n")[-22].split(" ")[1])
+        layer_macs = int(stats.split("\n")[-18].split(" ")[-1])
+        layer_cycles = int(stats.split("\n")[-23].split(" ")[-1])
+        print(layer_energy, layer_macs, layer_cycles)
+        return layer_energy, layer_macs, layer_cycles
+
+    except IndexError:
+        assert layer_type == "conv2d" and not all_dram
+        return _exec_timeloop_and_parse(n, hw_arch_path, hw_components_dir_path, layer_shape_path, 
+                                        map_path, mapper_config_path, layer_type, verbose, all_dram=True)
+        
+    
 
 def _get_linear_layer_yaml(batch_size, in_dim, out_dim):
 
@@ -253,14 +301,7 @@ problem:
     return layer_spec
 
 
-def _get_conv2d_map_yaml(batch_size,
-                         in_channel,
-                         out_channel,
-                         filter_height,
-                         filter_width,
-                         output_height,
-                         output_width):
-
+def _get_conv2d_map_all_dram_yaml():
     map_spec = f"""
 mapspace:
   targets:
@@ -270,15 +311,55 @@ mapspace:
       bypass: []
     - name: DRAM
       type: temporal
-      factors: P=0 Q=0
+      factors: C=0 # P=0 Q=0
       permutation: # MFPQ
     - name: global_buffer
       type: spatial
       factors: N=8
       permutation: #CMRSPQN
-    - name: global_buffer
+    - target: weights_reg
+      type: bypass
+      keep: [Weights]
+      bypass: [Inputs, Outputs]
+    - target: input_activation_reg
+      type: bypass
+      keep: [Inputs]
+      bypass: [Weights, Outputs]
+      permutation:
+    - target: output_activation_reg
+      type: bypass
+      keep: [Outputs]
+      bypass: [Weights, Inputs]"""
+    
+    return map_spec
+
+
+def _get_conv2d_map_yaml(batch_size,
+                         in_channel,
+                         out_channel,
+                         filter_height,
+                         filter_width,
+                         output_height,
+                         output_width,
+                         all_dram=False):
+    
+    if all_dram:
+        return _get_conv2d_map_all_dram_yaml()
+    
+    map_spec = f"""
+mapspace:
+  targets:
+    - name: DRAM
+      type: bypass
+      keep: [Inputs, Outputs, Weights]
+      bypass: []
+    - name: DRAM
       type: temporal
-      factors: R=0 S=0
+      factors: C=0 # P=0 Q=0
+      permutation: # MFPQ
+    - name: global_buffer
+      type: spatial
+      factors: N=8
       permutation: #CMRSPQN
     - target: weights_reg
       type: bypass
@@ -294,7 +375,7 @@ mapspace:
       keep: [Outputs]
       bypass: [Weights, Inputs]"""
 
-
+    
     map_spec_spe = f"""
 mapping:
   # mapping for the DRAM
@@ -336,6 +417,7 @@ mapping:
     type: bypass
     keep: [Outputs]
     bypass: [Weights, Inputs]"""
+
 
     return map_spec
 
@@ -432,7 +514,7 @@ mapspace:
       bypass: []
     - name: DRAM
       type: temporal
-      factors: F=0 P=0 Q=0 C=0 #M=20 #C=0 M=10 F=0
+      factors: F=0 P=0 Q=0 C=0 T=0 M=0 #M=20 #C=0 M=10 F=0
       permutation: # MFPQ
     - name: global_buffer
       type: spatial
@@ -440,7 +522,7 @@ mapspace:
       permutation: #CMRSPQN
     - name: global_buffer
       type: temporal
-      factors: R=0 S=0 T=0
+      factors: R=0 S=0
       permutation: #CMRSPQN
     - target: weights_reg
       type: bypass
