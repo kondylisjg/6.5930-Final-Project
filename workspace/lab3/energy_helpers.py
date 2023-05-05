@@ -104,6 +104,7 @@ def _exec_timeloop_and_parse(n, hw_arch_path, hw_components_dir_path, layer_shap
         map_path = PosixPath(map_path)
     
     
+    print("HERE:", hw_arch_path, hw_components_dir_path, layer_shape_path, map_path, mapper_config_path)
     stats, _ = run_timeloop_mapper(hw_arch_path, hw_components_dir_path, layer_shape_path, map_path, mapper_config_path)
 
     # debug
@@ -355,11 +356,15 @@ mapspace:
       bypass: []
     - name: DRAM
       type: temporal
-      factors: C=0 # P=0 Q=0
+      factors: P=0 Q=0
       permutation: # MFPQ
     - name: global_buffer
       type: spatial
       factors: N=8
+      permutation: #CMRSPQN
+    - name: global_buffer
+      type: temporal
+      factors: R=0 S=0
       permutation: #CMRSPQN
     - target: weights_reg
       type: bypass
@@ -514,7 +519,7 @@ mapspace:
       bypass: []
     - name: DRAM
       type: temporal
-      factors: F=0 P=0 Q=0 C=0 T=0 M=0 #M=20 #C=0 M=10 F=0
+      factors: F=0 P=0 Q=0 C=0 #M=20 #C=0 M=10 F=0
       permutation: # MFPQ
     - name: global_buffer
       type: spatial
@@ -522,7 +527,7 @@ mapspace:
       permutation: #CMRSPQN
     - name: global_buffer
       type: temporal
-      factors: R=0 S=0
+      factors: R=0 S=0 T=0
       permutation: #CMRSPQN
     - target: weights_reg
       type: bypass
