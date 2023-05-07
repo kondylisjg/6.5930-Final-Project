@@ -98,7 +98,7 @@ def _exec_timeloop_and_parse(n, hw_arch_path, hw_components_dir_path, layer_shap
     if all_dram:
         map_path = os.path.join(layers_path, "map_c2d_all_dram.yaml")
         
-        with open("_map/conv2d_map_all_dram.yaml", "w+") as f:
+        with open(map_path, "w+") as f:
             f.write(_get_conv2d_map_all_dram_yaml())
             
         map_path = PosixPath(map_path)
@@ -123,10 +123,10 @@ def _exec_timeloop_and_parse(n, hw_arch_path, hw_components_dir_path, layer_shap
         print(layer_energy, layer_macs, layer_cycles)
         return layer_energy, layer_macs, layer_cycles
 
-    except IndexError:
+    except (IndexError, ValueError, TypeError):
         assert layer_type == "conv2d" and not all_dram
         return _exec_timeloop_and_parse(n, hw_arch_path, hw_components_dir_path, layer_shape_path, 
-                                        map_path, mapper_config_path, layer_type, verbose, all_dram=True)
+                                        map_path, mapper_config_path, layer_type, layers_path, verbose, all_dram=True)
         
     
 
@@ -312,7 +312,7 @@ mapspace:
       bypass: []
     - name: DRAM
       type: temporal
-      factors: C=0 # P=0 Q=0
+      factors: C=0 P=0 Q=0 M=0 # P=0 Q=0
       permutation: # MFPQ
     - name: global_buffer
       type: spatial
