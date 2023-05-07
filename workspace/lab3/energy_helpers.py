@@ -360,7 +360,7 @@ mapspace:
       permutation: # MFPQ
     - name: global_buffer
       type: spatial
-      factors: N=8
+      factors: N=16
       permutation: #CMRSPQN
     - target: weights_reg
       type: bypass
