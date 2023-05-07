@@ -356,15 +356,11 @@ mapspace:
       bypass: []
     - name: DRAM
       type: temporal
-      factors: P=0 Q=0
+      factors: C=0 # P=0 Q=0
       permutation: # MFPQ
     - name: global_buffer
       type: spatial
-      factors: N=16
-      permutation: #CMRSPQN
-    - name: global_buffer
-      type: temporal
-      factors: R=0 S=0
+      factors: N=8
       permutation: #CMRSPQN
     - target: weights_reg
       type: bypass
